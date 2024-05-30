@@ -57,28 +57,72 @@ contract BookSubscriptionTest is Test {
         );
     }
 
-    function testFailedCreateSubscriptionHasOngoingSubscription() public {
-        bookSubscription.createPlan(1 ether, 5, 10 days);
-        bookSubscription.createPlan(1 ether, 5, 10 days);
+    function testFailedCreateSubscriptionPlanNotExist() public {
         vm.prank(user);
         vm.deal(user, 2 ether);
         bookSubscription.createSubscription{value: 1 ether}(
             0
         );
+    }
+
+    function testFailedCreateSubscriptionHasOngoignSubscription() public {
+        bookSubscription.createPlan(1 ether, 5, 10 days);
+        bookSubscription.createPlan(1 ether, 5, 10 days);
+        vm.prank(user);
+        vm.deal(user, 2 ether);
+        assertEq(bookSubscription.getSubscription(user).expiryDate,0);
+        vm.prank(user);
+        vm.deal(user, 2 ether);
+        bookSubscription.createSubscription{value: 1 ether}(
+            0
+        );
+        assertGt(bookSubscription.getSubscription(user).expiryDate,0);
+        vm.prank(user);
+        vm.deal(user, 2 ether);
         bookSubscription.createSubscription{value: 1 ether}(
             1
         );
     }
 
-    // function testAccessBook() public {
-    //     bookSubscription.createPlan(1 ether, 1, 10 days);
-    //     bookSubscription.createBook("What children want", "874-09j");
-    //     vm.prank(user);
-    //     vm.deal(user, 2 ether);
-    //     bookSubscription.createSubscription{value: 1 ether}(
-    //         0
-    //     );
-    //     bookSubscription.accessBook(0);
-    //     assertGt(bookSubscription.getSubscription(user).booksAccessed, 0);
-    // }
+    function testAccessBook() public {
+        bookSubscription.createPlan(1 ether, 1, 10 days);
+        bookSubscription.createBook("What children want", "874-09j");
+        vm.startPrank(user);
+        vm.deal(user, 2 ether);
+        bookSubscription.createSubscription{value: 1 ether}(
+            0
+        );
+        bookSubscription.accessBook(0);
+        assertGt(bookSubscription.getSubscription(user).booksAccessed, 0);
+        vm.stopPrank();
+    }
+
+    function testFailedAccessBookLimitExceed() public {
+        bookSubscription.createPlan(1 ether, 1, 10 days);
+        bookSubscription.createBook("What children want", "874-09j");
+        bookSubscription.createBook("What children want pt2", "874-09j");
+        vm.startPrank(user);
+        vm.deal(user, 2 ether);
+        bookSubscription.createSubscription{value: 1 ether}(
+            0
+        );
+        bookSubscription.accessBook(0);
+        bookSubscription.accessBook(1);
+        assertGt(bookSubscription.getSubscription(user).booksAccessed, 0);
+        vm.stopPrank();
+    }
+
+    function testFailedAccessBookTwice() public {
+        bookSubscription.createPlan(1 ether, 2, 10 days);
+        bookSubscription.createBook("What children want", "874-09j");
+        vm.startPrank(user);
+        vm.deal(user, 2 ether);
+        bookSubscription.createSubscription{value: 1 ether}(
+            0
+        );
+        bookSubscription.accessBook(0);
+        bookSubscription.accessBook(0);
+        assertGt(bookSubscription.getSubscription(user).booksAccessed, 0);
+        vm.stopPrank();
+    }
 }

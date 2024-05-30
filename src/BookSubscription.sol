@@ -93,7 +93,6 @@ contract BookSubscription {
         if (subscription.expiryDate > 0 && subscription.expiryDate <= block.timestamp) {
             delete subscriptions[msg.sender];
         }
-
         require(subscription.expiryDate==0, "you have an ongoing subscription");
 
         Plan memory plan = plans[_planId];
