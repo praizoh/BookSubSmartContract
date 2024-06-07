@@ -2,6 +2,8 @@
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
+Contract is deployed to the sepolia network at : **0xBa8958670d134A98Ec59A0998e50F45888b78A83**
+
 Foundry consists of:
 
 -   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
